@@ -244,16 +244,29 @@ module FemtoRV32(
 
    // La petición se recuerda hasta que se acepta, porque solo se revisa
    // en EXECUTE. Una petición que llega durante la atención no se pierde.
+   // Se atiende el flanco de subida de interrupt_request, no el nivel: una
+   // entrada que se queda en 1 (por ejemplo, un pulsador presionado) produce
+   // una sola interrupción. irq_sync sincroniza la entrada con el reloj.
    reg  interrupt_request_sticky;
+   reg  [1:0] irq_sync;
+   reg  irq_prev;
+   wire irq_rise = irq_sync[1] & ~irq_prev;
 
    // Se atiende si está habilitada (mstatus) y no hay otra en curso (mcause).
    wire interrupt          = interrupt_request_sticky & mstatus & ~mcause;
    wire interrupt_accepted = interrupt & (state == EXECUTE);
 
    always @(posedge clk)
-      if (!reset) interrupt_request_sticky <= 1'b0;
-      else        interrupt_request_sticky <= interrupt_request |
+      if (!reset) begin
+         irq_sync <= 2'b00;
+         irq_prev <= 1'b0;
+         interrupt_request_sticky <= 1'b0;
+      end else begin
+         irq_sync <= {irq_sync[0], interrupt_request};
+         irq_prev <= irq_sync[1];
+         interrupt_request_sticky <= irq_rise |
                      (interrupt_request_sticky & ~interrupt_accepted);
+      end
 
    // MRET (SYSTEM con funct3 = 0)
    wire interrupt_return = isSYSTEM & funct3Is[0];

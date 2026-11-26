@@ -15,6 +15,7 @@ OBJS+= ../femto_UN/src/mult.v
 OBJS+= ../femto_UN/src/bram.v
 OBJS+= ../femto_UN/src/MappedSPIFlash.v
 OBJS+= ../femto_UN/src/MappedSPIRAM.v
+OBJS+= ../femto_UN/src/MappedSPIBus.v
 
 //OBJS+= cores/spi_flash/MappedSPIFlash.v
 SIM_OBJS = cores/sim_spi_flash/spiflash.v

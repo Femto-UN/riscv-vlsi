@@ -83,13 +83,13 @@ Valores de `stats/metrics.csv` del repositorio del shuttle.
 | Holgura de setup, esquina lenta (ss, 100 °C, 1,60 V) | −4,85 ns (peor caso) |
 | Potencia estimada, esquina típica | 6,58 mW |
 
-El precheck de Tiny Tapeout aprobó todas sus verificaciones. El reporte está en `vlsi/femto_UN/test/238_tt_um_femto_UN/19103989012_gds/precheck_reports/`.
+El precheck de Tiny Tapeout aprobó todas sus verificaciones. El reporte está en [`disenos/vlsi/femto_UN/test/238_tt_um_femto_UN/19103989012_gds/precheck_reports/`](../../disenos/vlsi/femto_UN/test/238_tt_um_femto_UN/19103989012_gds/precheck_reports/).
 
 ## Observaciones
 
 - Con la restricción de 25 ns el diseño cumple tiempos en las esquinas típica y rápida, pero no en la lenta (ss, 100 °C), donde requeriría un periodo cercano a 30 ns.
 - LibreLane reporta 20 redes con violaciones de antena después de insertar los diodos; el precheck no las marcó como bloqueantes.
-- La carpeta `tinytapeout_femto_UN/` corresponde al commit `b28ff83`, posterior a la fabricación. Respecto al commit fabricado (`baab83f`) solo difiere `src/MappedSPIFlash.v`.
+- La carpeta [`disenos/femto_UN_fabricado/`](../../disenos/femto_UN_fabricado/) corresponde al commit `b28ff83`, posterior a la fabricación. Respecto al commit fabricado (`baab83f`) solo difiere `src/MappedSPIFlash.v`.
 
 ## Fuentes
 

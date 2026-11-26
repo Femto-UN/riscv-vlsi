@@ -13,7 +13,7 @@ Copia exacta del repositorio **[cicamargoba/femto_UN](https://github.com/cicamar
 ## Reglas
 
 - **Esta carpeta no se modifica.** Es la referencia del diseño fabricado.
-- Las mejoras y correcciones se realizan en la carpeta `vlsi/` o en las carpetas que se definan para cada objetivo.
+- Las mejoras y correcciones se realizan en la carpeta [`disenos/vlsi/`](../vlsi/) o en las carpetas que se definan para cada objetivo.
 
 ## Observaciones
 

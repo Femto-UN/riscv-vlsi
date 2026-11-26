@@ -1,5 +1,8 @@
 /* verilator lint_off SYNCASYNCNET */
-module tt_um_femto(
+module tt_um_femto #(
+    parameter SPI_DIV     = 2,       // SCK = clk / (2*SPI_DIV)
+    parameter SPI_CS_WAIT = 1        // espera alrededor de cada trama SPI (medios periodos)
+)(
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
@@ -18,47 +21,46 @@ module tt_um_femto(
   always @(negedge clk) resetn <= rst_n;
   /* verilator lint_off UNDRIVEN */
 	
-	femto femto0( 
+	femto #(.SPI_DIV(SPI_DIV), .SPI_CS_WAIT(SPI_CS_WAIT)) femto0( 
 		.clk          (clk), 
 		.resetn       (resetn), 
-		.spi_mosi     (uo_out[0]),
-		.spi_mosi_ram (uo_out[1]),
-		.spi_cs_n     (uo_out[2]),
-		.spi_cs_n_ram (uo_out[3]),
-		.spi_clk_ram  (uo_out[4]),
+		.spi_mosi     (uo_out[0]),     // bus SPI compartido por la flash y la RAM
+		.spi_cs_n     (uo_out[2]),     // CS de la flash
+		.spi_cs_n_ram (uo_out[3]),     // CS de la RAM
 		.spi_clk      (uo_out[5]),
 		.LEDS         (uo_out[6]),
 		.TXD          (uo_out[7]),
 		
 		.spi_miso     (ui_in[0]),
-		.spi_miso_ram (ui_in[1]),
 		.RXD          (ui_in[2]),
       .interrupt_request (ui_in[3])
 
 		
 	);
 	
-	wire _unused = &{ena, uio_oe[7:0] , uio_in[7:0], uio_out[7:0], ui_in[7:4], 1'b0};
+	assign uo_out[1] = 1'b0;         // libres con el bus único
+	assign uo_out[4] = 1'b0;
+	wire _unused = &{ena, uio_oe[7:0] , uio_in[7:0], uio_out[7:0], ui_in[7:4], ui_in[1], 1'b0};
 	assign uio_out = 8'h00;
 	assign uio_oe = 8'h00;
 	
 /* verilator lint_on UNDRIVEN */
 endmodule
 
-module femto (
+module femto #(
+   parameter SPI_DIV     = 2,        // SCK = clk / (2*SPI_DIV)
+   parameter SPI_CS_WAIT = 1         // espera alrededor de cada trama SPI (medios periodos)
+) (
    input 	     clk,    // system clock 
    input 	     resetn, // reset button
    input         interrupt_request,
 
+   // Bus SPI único: SCK, MOSI y MISO compartidos, un CS por memoria
    output        spi_mosi,
    input         spi_miso,
-   output        spi_cs_n,
    output        spi_clk,
-
-   output      spi_clk_ram,      // SPI RAM Clock
-   output      spi_cs_n_ram,     // SPI RAM Chip Select, Active Low
-   input       spi_miso_ram,     // SPI RAM Master In Slave Out
-   output      spi_mosi_ram,     // SPI RAM Master Out Slave In
+   output        spi_cs_n,         // CS de la flash, activo en bajo
+   output        spi_cs_n_ram,     // CS de la RAM, activo en bajo
 
    output        wire LEDS,   // system LEDs
    input 	     RXD,    // UART receive
@@ -69,8 +71,7 @@ module femto (
    wire mem_rstrb;
    wire  [31:0] mem_wdata;
    wire [3:0]  mem_wmask;
-
-   wire mapped_spi_flash_rbusy;
+   wire spi_busy;                    // bus SPI ocupado (lectura o escritura)
 
    FemtoRV32 CPU(
       .clk(clk),
@@ -80,46 +81,34 @@ module femto (
       .mem_rstrb(mem_rstrb),
       .mem_wdata(mem_wdata),
       .mem_wmask(mem_wmask),
-      .mem_rbusy(mapped_spi_flash_rbusy | spi_ram_rbusy),
-      .mem_wbusy(spi_ram_wbusy),
+      .mem_rbusy(spi_busy),
+      .mem_wbusy(spi_busy),
       .interrupt_request(interrupt_request)
    );
-   wire [31:0] RAM_rdata;
    wire  wr = |mem_wmask;
    wire  rd = mem_rstrb; 
-   wire spi_ram_rbusy;
-   wire spi_ram_wbusy;
-   MappedSPIRAM mapped_spi_ram(
-      .clk(clk),
-      .reset(resetn),
-      .word_address(mem_address[15:0]),
-      .wdata(mem_wdata[31:0]),
-      .rd(cs[6] & rd),
-      .wr(cs[6] & wr),
-      .rbusy(spi_ram_rbusy),
-      .wbusy(spi_ram_wbusy),
-      .CLK(spi_clk_ram),
-      .CS_N(spi_cs_n_ram),
-      .MISO(spi_miso_ram),
-      .MOSI(spi_mosi_ram),
-      .rdata(dpram_dout)
-   );
+   wire [31:0] spi_rdata;
 
-   MappedSPIFlash mapped_spi_flash(
+   // Flash (cs[0]) y RAM (cs[6]) en el mismo bus SPI
+   MappedSPIBus #(.DIV(SPI_DIV), .CS_WAIT(SPI_CS_WAIT)) mapped_spi(
       .clk(clk),
-      .reset(resetn),
-      .rstrb(cs[0] & rd),
-      .word_address(mem_address[21:2]),
-      .rdata(RAM_rdata),
-      .rbusy(mapped_spi_flash_rbusy),
-      .CLK(spi_clk),
-      .CS_N(spi_cs_n),
-      .MISO(spi_miso),
-      .MOSI(spi_mosi)
+      .resetn(resetn),
+      .rd((cs[0] | cs[6]) & rd),
+      .wr(cs[6] & wr),
+      .cs_flash(cs[0]),
+      .cs_ram(cs[6]),
+      .mem_addr(mem_address[23:0]),
+      .mem_wdata(mem_wdata),
+      .rdata(spi_rdata),
+      .busy(spi_busy),
+      .spi_sck(spi_clk),
+      .spi_mosi(spi_mosi),
+      .spi_miso(spi_miso),
+      .spi_cs_flash_n(spi_cs_n),
+      .spi_cs_ram_n(spi_cs_n_ram)
    );
 
    wire [31:0] uart_dout;
-   wire [31:0] dpram_dout;
 
   peripheral_uart #(
      .clk_freq(27000000),    // 27000000 for gowin
@@ -159,13 +148,13 @@ module femto (
   always @*
   begin
       case (cs)
-        7'b1000000: mem_rdata = dpram_dout;
+        7'b1000000: mem_rdata = spi_rdata;
         7'b0100000: mem_rdata = uart_dout;
 //        7'b0010000: mem_rdata = gpio_dout;
 //        7'b0001000: mem_rdata = mult_dout;
 //        7'b0000100: mem_rdata = div_dout;
 //        7'b0000010: mem_rdata = bin2bcd_dout;
-        7'b0000001: mem_rdata = RAM_rdata;
+        7'b0000001: mem_rdata = spi_rdata;
         default:    mem_rdata = 32'h00000000;
       endcase
   end

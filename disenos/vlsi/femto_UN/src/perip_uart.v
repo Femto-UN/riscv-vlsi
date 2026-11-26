@@ -41,7 +41,10 @@ always @(posedge clk) begin
   end
   else begin
 	d_in_uart <= (s[0] & wr) ? d_in[7:0] : d_in_uart; // data in uart
-	uart_ctrl <= (s[1] & wr) ? d_in[7:0] : uart_ctrl; // data controller 5'b0, LED, tx_wr, rx_ack
+	// data controller 5'b0, LED, tx_wr, rx_ack
+	// tx_wr (bit 3) y rx_ack (bit 0) duran un solo ciclo: si se quedaran en 1 hasta la
+	// siguiente escritura, la UART repetiría el byte o descartaría el siguiente.
+	uart_ctrl <= (s[1] & wr) ? d_in[7:0] : (uart_ctrl & 8'b1111_0110);
 	ledout    <= uart_ctrl[2];	// write ledout register
   end
 end

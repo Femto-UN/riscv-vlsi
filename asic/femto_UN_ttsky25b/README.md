@@ -85,6 +85,49 @@ Valores de `stats/metrics.csv` del repositorio del shuttle.
 
 El precheck de Tiny Tapeout aprobó todas sus verificaciones. El reporte está en [`disenos/vlsi/femto_UN/test/238_tt_um_femto_UN/19103989012_gds/precheck_reports/`](../../disenos/vlsi/femto_UN/test/238_tt_um_femto_UN/19103989012_gds/precheck_reports/).
 
+## Verificación física y confirmación de fabricación
+
+### DRC
+
+Reportes del precheck oficial de Tiny Tapeout en [`precheck_reports/`](../../disenos/vlsi/femto_UN/test/238_tt_um_femto_UN/19103989012_gds/precheck_reports/).
+
+| Chequeo | Herramienta | Violaciones |
+|---|---|---|
+| FEOL | KLayout | 0 |
+| BEOL | KLayout | 0 |
+| N-well / URPM | KLayout | 0 |
+| Off-grid | KLayout | 0 |
+| Etiquetas de pines sobre dibujo | KLayout | 0 |
+| Área cero | KLayout | 0 |
+| DRC completo | Magic | 0 |
+| Superposiciones ilegales | Magic | 0 |
+| DRC de ruteo (final, iteración 7) | OpenROAD | 0 |
+
+### LVS
+
+Comparación con netgen entre la netlist del layout extraído y la netlist post-síntesis: **"Circuits match uniquely"**.
+
+| Métrica de LVS | Valor |
+|---|---|
+| Errores totales | 0 |
+| Diferencias de dispositivos / redes | 0 / 0 |
+| Dispositivos, redes y pines sin correspondencia | 0 / 0 / 0 |
+| Fallas de propiedades | 0 |
+
+Los artefactos de la corrida oficial guardados en el repositorio no incluyen el reporte de LVS, por lo que este se tomó de una reproducción local del flujo con LibreLane 2.4.2 y `sky130A`, sobre el mismo commit fabricado (`baab83f`); se verificó que `femto.v` es idéntico al de la corrida oficial. Las métricas de antenas de la reproducción coinciden con las oficiales.
+
+Archivos en [`verificacion/`](verificacion/): `lvs.netgen.rpt` y `metrics_reproduccion_local.csv`.
+
+### Antenas y pines
+
+- Se insertaron 122 diodos de antena; quedan 20 redes (26 pines) con violaciones de antena, no bloqueantes para el precheck.
+- 14 pines desconectados, ninguno crítico.
+
+### Confirmación de fabricación
+
+- El diseño forma parte del shuttle TTSKY25b: su layout está en el repositorio oficial del shuttle, [`projects/tt_um_femto`](https://github.com/TinyTapeout/tinytapeout-sky-25b/tree/main/projects/tt_um_femto), y aparece en la [página del shuttle](https://tinytapeout.com/chips/ttsky25b/).
+- El chip fabricado se recibió montado en la placa de demostración de Tiny Tapeout y se probó en hardware: arranque desde la flash emulada, Hello World por UART, lectura y escritura de la RAM FM25V02 y programa de mayúsculas. Las evidencias están en [`pruebas/chip_femto_UN/`](../../pruebas/chip_femto_UN/).
+
 ## Observaciones
 
 - Con la restricción de 25 ns el diseño cumple tiempos en las esquinas típica y rápida, pero no en la lenta (ss, 100 °C), donde requeriría un periodo cercano a 30 ns.

@@ -1,0 +1,46 @@
+// Pines de femto_UN en la Tang Primer 20K Dock.
+// Todo el bus va en el PMOD0 (el que está bajo "MIC ARRAY").
+
+IO_LOC  "clk27" H11;
+IO_PORT "clk27" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// Botones (activos en bajo): S0 = reset, S1 = IRQ
+IO_LOC  "btn_rst_n" T10;
+IO_PORT "btn_rst_n" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+IO_LOC  "btn_irq_n" T3;
+IO_PORT "btn_irq_n" IO_TYPE=LVCMOS15 PULL_MODE=UP;
+
+// Bus SPI compartido por el ESP32-C6 (flash) y la FM25V02 (RAM).
+// DRIVE=4 (4 mA): flancos más suaves, menos rebotes en los cables largos.
+IO_LOC  "ram_cs_n"   T6;
+IO_PORT "ram_cs_n"   IO_TYPE=LVCMOS33 DRIVE=4;
+IO_LOC  "spi_sck"    T7;
+IO_PORT "spi_sck"    IO_TYPE=LVCMOS33 DRIVE=4;
+IO_LOC  "spi_mosi"   T8;
+IO_PORT "spi_mosi"   IO_TYPE=LVCMOS33 DRIVE=4;
+IO_LOC  "spi_miso"   P9;
+IO_PORT "spi_miso"   IO_TYPE=LVCMOS33 PULL_MODE=UP;
+IO_LOC  "flash_cs_n" P8;
+IO_PORT "flash_cs_n" IO_TYPE=LVCMOS33 DRIVE=4;
+
+// UART por el FTDI
+IO_LOC  "ftdi_tx" P6;
+IO_PORT "ftdi_tx" IO_TYPE=LVCMOS33;
+IO_LOC  "ftdi_rx" R8;
+IO_PORT "ftdi_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// UART por el USB del Dock
+IO_LOC  "uart_tx" M11;
+IO_PORT "uart_tx" IO_TYPE=LVCMOS33;
+IO_LOC  "uart_rx" T13;
+IO_PORT "uart_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// LEDs del Dock (activos en bajo)
+IO_LOC  "led_n[0]" L14;
+IO_PORT "led_n[0]" IO_TYPE=LVCMOS33;
+IO_LOC  "led_n[1]" L16;
+IO_PORT "led_n[1]" IO_TYPE=LVCMOS33;
+IO_LOC  "led_n[2]" N14;
+IO_PORT "led_n[2]" IO_TYPE=LVCMOS33;
+IO_LOC  "led_n[3]" N16;
+IO_PORT "led_n[3]" IO_TYPE=LVCMOS33;

@@ -10,7 +10,7 @@ El punto de partida es **femto_UN**, un microcontrolador basado en el núcleo RI
 
 - **Diseño fabricado:** diagrama del RTL, vistas 2D y 3D del layout y métricas de implementación → [`asic/femto_UN_ttsky25b/`](asic/femto_UN_ttsky25b/)
 - **El chip funciona en hardware:** arranque con flash emulada, `Hello World from femto UN` por UART y lectura, escritura y persistencia en una RAM FM25V02 → [`pruebas/chip_femto_UN/`](pruebas/chip_femto_UN/)
-- **Informe técnico de las pruebas** → [`informes/`](informes/)
+- **Informe técnico de las pruebas** → [PDF](informes/pruebas_femto_UN/informe_pruebas_femto_UN.pdf) · [fuentes](informes/pruebas_femto_UN/)
 
 ## Estado por objetivo
 
@@ -18,7 +18,7 @@ El punto de partida es **femto_UN**, un microcontrolador basado en el núcleo RI
 |---|---|---|---|
 | OE1. Entorno de verificación open-source | [#9](https://github.com/Femto-UN/riscv-vlsi/issues/9) | [`disenos/vlsi/`](disenos/vlsi/) | Simulaciones con Icarus Verilog y cocotb existentes; falta documentarlas y recopilar sus resultados |
 | OE2. Microcontrolador RISC-V con periféricos | [#10](https://github.com/Femto-UN/riscv-vlsi/issues/10) | [`disenos/`](disenos/) | RTL fabricado documentado; falta el documento de arquitectura, subir las mejoras (bus SPI compartido e interrupciones) y los reportes de síntesis |
-| OE3. Documentación y material educativo | [#11](https://github.com/Femto-UN/riscv-vlsi/issues/11) | [`informes/`](informes/) | Informe de pruebas en preparación |
+| OE3. Documentación y material educativo | [#11](https://github.com/Femto-UN/riscv-vlsi/issues/11) | [`informes/`](informes/) | Informe de pruebas publicado ([PDF](informes/pruebas_femto_UN/informe_pruebas_femto_UN.pdf)); falta el inventario del material educativo |
 | OE4. Implementación y validación en FPGA | [#12](https://github.com/Femto-UN/riscv-vlsi/issues/12) | — | Pendiente de subir el flujo y las pruebas en la Tang Primer 20K |
 | OE5. Fabricación con Tiny Tapeout | [#13](https://github.com/Femto-UN/riscv-vlsi/issues/13) | [`asic/`](asic/), [`pruebas/`](pruebas/) | Diseño fabricado y pruebas del chip documentados; falta el reporte de DRC/LVS |
 | OE6. Revisión del área de electrónica digital | [#14](https://github.com/Femto-UN/riscv-vlsi/issues/14) | — | A cargo del equipo docente |

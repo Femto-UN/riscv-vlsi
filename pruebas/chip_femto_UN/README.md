@@ -1,6 +1,6 @@
 # Pruebas del chip femto_UN fabricado
 
-Evidencias de las pruebas realizadas al chip femto_UN en la placa de demostración de Tiny Tapeout: fotos del montaje, capturas del analizador lógico y de las terminales, y las sesiones originales de PulseView. La descripción completa de cada prueba está en el informe técnico del proyecto.
+Evidencias de las pruebas realizadas al chip femto_UN en la placa de demostración de Tiny Tapeout: fotos del montaje, capturas del analizador lógico y de las terminales, y las sesiones originales de PulseView. La descripción completa de cada prueba está en el informe técnico del proyecto, en [`informes/`](../../informes/). Las vistas del layout y el diagrama del RTL están en [`asic/femto_UN_ttsky25b/`](../../asic/femto_UN_ttsky25b/).
 
 Condiciones comunes a todas las pruebas:
 
@@ -12,7 +12,7 @@ Condiciones comunes a todas las pruebas:
 ## Contenido
 
 ```
-pruebas_chip/
+chip_femto_UN/
 ├── fotos/                  Montaje físico
 ├── capturas/
 │   ├── arranque_flash/     Primer arranque y Hello World
